@@ -17,6 +17,9 @@ public final class ErrorCodes {
     
     private Map<Class, ErrorCode> mappedErrorCodes = new ConcurrentHashMap<Class, ErrorCode>();
     
+    private ErrorCodes() {
+    }
+    
     public void mapErrorCode(Class clazz, ErrorCode errorCode) {
         mappedErrorCodes.put(clazz, errorCode);
     }

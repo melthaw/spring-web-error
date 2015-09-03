@@ -42,8 +42,7 @@ import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMeth
  * be able to use a {@link org.springframework.web.servlet.LocaleResolver} for
  * internationalization https://jira.spring.io/browse/SPR-8580
  *
- * @see org.springframework.web.servlet.mvc.method.annotation.
- *      ResponseEntityExceptionHandler
+ * @see org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
  */
 @ControllerAdvice(annotations = RestController.class)
 public class ResponseEntityExceptionHandler implements InitializingBean {
@@ -66,7 +65,7 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
     
     private boolean i18nEnabled = false;
     
-    private boolean detailEnabled = true;
+    private boolean developerEnabled = false;
     
     @Autowired(required = false)
     private MessageSource resourceBundle;
@@ -98,12 +97,12 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
         this.i18nEnabled = i18nEnabled;
     }
     
-    public boolean isDetailEnabled() {
-        return detailEnabled;
+    public boolean isDeveloperEnabled() {
+        return developerEnabled;
     }
     
-    public void setDetailEnabled(boolean detailEnabled) {
-        this.detailEnabled = detailEnabled;
+    public void setDeveloperEnabled(boolean developerEnabled) {
+        this.developerEnabled = developerEnabled;
     }
     
     /**
@@ -128,9 +127,11 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
                                 MethodArgumentNotValidException.class,
                                 BindException.class,
                                 NoHandlerFoundException.class,
-                                AccessDeniedException.class })
+                                AccessDeniedException.class,
+                                ApplicationException.class })
     public final ResponseEntity<Object> handleException(Exception exception,
                                                         HttpServletRequest request) {
+        logger.error(exception, exception);
         final HttpHeaders headers = new HttpHeaders();
         if (exception instanceof NoSuchRequestHandlingMethodException) {
             return handleNoSuchRequestHandlingMethod((NoSuchRequestHandlingMethodException) exception,
@@ -222,6 +223,11 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
                                                SharedErrorCode.UNAUTHORIZED,
                                                request);
         }
+        else if (exception instanceof ApplicationException) {
+            return handleApplicationException((ApplicationException) exception,
+                                              headers,
+                                              request);
+        }
         else {
             logger.warn("Unknown exception type: "
                         + exception.getClass().getName());
@@ -251,14 +257,6 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
             return new ResponseEntity<>(errorContainer,
                                         httpHeaders,
                                         SharedErrorCode.UNEXPECTED_ERROR.getHttpStatus());
-        }
-        
-        if (e instanceof ApplicationException) {
-            return getResponseEntity(request,
-                                     httpHeaders,
-                                     e,
-                                     ((ApplicationException) e).getErrorCode(),
-                                     ((ApplicationException) e).getArguments());
         }
         
         Class errorClazz = e.getClass();
@@ -633,7 +631,6 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
                                                                   HttpHeaders headers,
                                                                   ErrorCode errorCode,
                                                                   HttpServletRequest request) {
-        final HttpHeaders httpHeaders = new HttpHeaders();
         final ErrorContainer error = new ErrorContainer();
         error.setErrorCode(SharedErrorCode.BAD_REQUEST);
         error.setErrorMessage(SharedErrorCode.BAD_REQUEST.getHttpStatus()
@@ -651,13 +648,13 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
             }
             error.setFormError(formErrorList);
         }
-        if (isDetailEnabled() && (exception.getStackTrace() != null)) {
+        if (isDeveloperEnabled() && (exception.getStackTrace() != null)) {
             error.setDeveloperMessage(Arrays.toString(exception.getStackTrace()));
         }
         error.setMoreInfo(exception.getMessage());
         
         return new ResponseEntity<>(error,
-                                    httpHeaders,
+                                    headers,
                                     SharedErrorCode.BAD_REQUEST.getHttpStatus());
     }
     
@@ -710,14 +707,32 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
                                                          HttpHeaders headers,
                                                          ErrorCode errorCode,
                                                          HttpServletRequest request) {
-        ErrorContainer errorContainer = convert2ErrorContainer(exception,
-                                                               errorCode,
-                                                               request);
-        return handleExceptionInternal(exception,
-                                       errorContainer,
-                                       headers,
-                                       errorCode.getHttpStatus(),
-                                       request);
+        final ErrorContainer error = new ErrorContainer();
+        error.setErrorCode(SharedErrorCode.BAD_REQUEST);
+        error.setErrorMessage(SharedErrorCode.BAD_REQUEST.getHttpStatus()
+                                                         .getReasonPhrase());
+        if (exception.getBindingResult() != null) {
+            List<FormError> formErrorList = new ArrayList<FormError>();
+            for (ObjectError objectError : exception.getBindingResult()
+                                                    .getAllErrors()) {
+                if (objectError instanceof FieldError) {
+                    FormError formError = new FormError();
+                    formError.setField(((FieldError) objectError).getField());
+                    formError.setMessage(((FieldError) objectError).getDefaultMessage());
+                    formErrorList.add(formError);
+                }
+            }
+            error.setFormError(formErrorList);
+        }
+        if (isDeveloperEnabled() && (exception.getStackTrace() != null)) {
+            error.setDeveloperMessage(Arrays.toString(exception.getStackTrace()));
+        }
+        error.setMoreInfo(exception.getMessage());
+        
+        return new ResponseEntity<>(error,
+                                    headers,
+                                    SharedErrorCode.BAD_REQUEST.getHttpStatus());
+                                    
     }
     
     /**
@@ -762,6 +777,26 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
                                                                  HttpHeaders headers,
                                                                  ErrorCode errorCode,
                                                                  HttpServletRequest request) {
+        ErrorContainer errorContainer = convert2ErrorContainer(exception,
+                                                               errorCode,
+                                                               request);
+        return handleExceptionInternal(exception,
+                                       errorContainer,
+                                       headers,
+                                       errorCode.getHttpStatus(),
+                                       request);
+    }
+    
+    /**
+     * @param exception
+     * @param headers
+     * @param request
+     * @return
+     */
+    protected ResponseEntity<Object> handleApplicationException(ApplicationException exception,
+                                                                HttpHeaders headers,
+                                                                HttpServletRequest request) {
+        ErrorCode errorCode = exception.getErrorCode();
         ErrorContainer errorContainer = convert2ErrorContainer(exception,
                                                                errorCode,
                                                                request);
@@ -861,7 +896,7 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
                                      ErrorCode errorCode,
                                      Object[] messageArguments,
                                      HttpServletRequest request) {
-        if (isI18nEnabled()) {
+        if (!isI18nEnabled()) {
             String result = throwable.getMessage();
             if (StringUtils.isEmpty(result)) {
                 result = errorCode.getHttpStatus().getReasonPhrase();
@@ -920,15 +955,15 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
         ErrorContainer result = new ErrorContainer();
         result.setErrorCode(errorCode);
         result.setErrorMessage(getErrorMessage(throwable,
-                                               errorCode,
-                                               messageArguments,
-                                               request));
-        if (isDetailEnabled()) {
+                errorCode,
+                messageArguments,
+                request));
+        if (isDeveloperEnabled()) {
             if (throwable.getStackTrace() != null) {
                 result.setDeveloperMessage(Arrays.toString(throwable.getStackTrace()));
             }
+            result.setMoreInfo(throwable.getMessage());
         }
-        result.setMoreInfo(throwable.getMessage());
         return result;
     }
     
@@ -938,4 +973,5 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
             throw new IllegalStateException("The i18n feature is enabled but the resource bundle is not injected.");
         }
     }
+
 }

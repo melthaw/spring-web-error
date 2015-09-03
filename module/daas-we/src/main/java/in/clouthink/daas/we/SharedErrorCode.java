@@ -10,6 +10,7 @@ public enum SharedErrorCode implements ErrorCode {
     BAD_REQUEST(HttpStatus.BAD_REQUEST),
     NOT_FOUND(HttpStatus.NOT_FOUND),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
+    FORBIDDEN(HttpStatus.FORBIDDEN),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED),
     UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR);
 
