@@ -65,7 +65,7 @@ How to enable the new `in.clouthink.daas.we.ResponseEntityExceptionHandler` impl
     public ResponseEntityExceptionHandler responseEntityExceptionHandler() {
         ResponseEntityExceptionHandler result = new ResponseEntityExceptionHandler();
         result.setI18nEnabled(false);
-        result.setDetailEnabled(true);
+        result.setDeveloperEnabled(true);
         return result;
     }
     
