@@ -76,11 +76,11 @@ How to run the daas we sample :
     
 Follow the sample `in.clouthink.daas.we.sample.web.SampleRestApi` in module/daas-we-sample.
      
-     
+
     @RequestMapping(value = "/err1", method = RequestMethod.GET)
     @ResponseBody
     public void err1() {
-        throw new RuntimeException();
+        throw new RuntimeException("Hello error world");
     }
     
     @RequestMapping(value = "/err2", method = RequestMethod.GET)
@@ -97,7 +97,7 @@ Follow the sample `in.clouthink.daas.we.sample.web.SampleRestApi` in module/daas
     @RequestMapping(value = "/err4", method = RequestMethod.GET)
     @ResponseBody
     public void err4() {
-        throw new org.springframework.security.access.AccessDeniedException("test");
+        throw new org.springframework.security.access.AccessDeniedException("The username or password is invalid");
     }
     
     @RequestMapping(value = "/err5", method = RequestMethod.GET)
@@ -106,8 +106,7 @@ Follow the sample `in.clouthink.daas.we.sample.web.SampleRestApi` in module/daas
         throw new ApplicationException(SharedErrorCode.BAD_REQUEST,
                                        "The error message is customized");
     }
-    
-    
+        
 For the case err1, we will get the 500 http status response and  the expected error response is :
     
     {
