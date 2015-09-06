@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
     <name>daas-we</name>
     <url>http://clouthink.in</url>
-    <description>The lightweight event driven message framework based on reactor.</description>
+    <description>The general web error(we) handler abstraction based on Spring MVC Framework.</description>
 
     <licenses>
         <license>

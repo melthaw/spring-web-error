@@ -835,10 +835,14 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
     
     /**
      * @param request
+     *            request
      * @param httpHeaders
+     *            httpHeaders
      * @param throwable
+     *            throwable
      * @param errorCode
-     * @return
+     *            errorCode
+     * @return ResponseEntity
      */
     protected ResponseEntity<ErrorContainer> getResponseEntity(HttpServletRequest request,
                                                                HttpHeaders httpHeaders,
@@ -853,11 +857,16 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
     
     /**
      * @param request
+     *            request
      * @param httpHeaders
+     *            httpHeaders
      * @param throwable
+     *            throwable
      * @param errorCode
+     *            errorCode
      * @param messageArguments
-     * @return
+     *            messageArguments
+     * @return ResponseEntity
      */
     protected ResponseEntity<ErrorContainer> getResponseEntity(HttpServletRequest request,
                                                                HttpHeaders httpHeaders,
@@ -875,9 +884,12 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
     
     /**
      * @param throwable
+     *            throwable
      * @param errorCode
+     *            errorCode
      * @param request
-     * @return
+     *            request
+     * @return String
      */
     protected String getErrorMessage(Throwable throwable,
                                      ErrorCode errorCode,
@@ -887,10 +899,14 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
     
     /**
      * @param throwable
+     *            throwable
      * @param errorCode
+     *            errorCode
      * @param messageArguments
+     *            messageArguments
      * @param request
-     * @return
+     *            request
+     * @return String
      */
     protected String getErrorMessage(Throwable throwable,
                                      ErrorCode errorCode,
@@ -931,9 +947,12 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
     
     /**
      * @param throwable
+     *            the target exception
      * @param errorCode
+     *            errorCode
      * @param request
-     * @return
+     *            request
+     * @return ErrorContainer
      */
     protected ErrorContainer convert2ErrorContainer(Throwable throwable,
                                                     ErrorCode errorCode,
@@ -943,10 +962,14 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
     
     /**
      * @param throwable
+     *            throwable
      * @param errorCode
+     *            errorCode
      * @param messageArguments
+     *            messageArguments
      * @param request
-     * @return
+     *            request
+     * @return ErrorContainer
      */
     protected ErrorContainer convert2ErrorContainer(Throwable throwable,
                                                     ErrorCode errorCode,
@@ -955,9 +978,9 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
         ErrorContainer result = new ErrorContainer();
         result.setErrorCode(errorCode);
         result.setErrorMessage(getErrorMessage(throwable,
-                errorCode,
-                messageArguments,
-                request));
+                                               errorCode,
+                                               messageArguments,
+                                               request));
         if (isDeveloperEnabled()) {
             if (throwable.getStackTrace() != null) {
                 result.setDeveloperMessage(Arrays.toString(throwable.getStackTrace()));
@@ -973,5 +996,5 @@ public class ResponseEntityExceptionHandler implements InitializingBean {
             throw new IllegalStateException("The i18n feature is enabled but the resource bundle is not injected.");
         }
     }
-
+    
 }
