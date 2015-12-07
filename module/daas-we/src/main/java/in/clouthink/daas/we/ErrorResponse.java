@@ -1,10 +1,8 @@
 package in.clouthink.daas.we;
 
-import java.util.List;
-
-public class ErrorContainer {
+public class ErrorResponse {
     
-    private ErrorCode errorCode;
+    private String errorCode;
     
     private String errorMessage;
     
@@ -12,13 +10,11 @@ public class ErrorContainer {
     
     private String moreInfo;
     
-    private List<FormError> formError;
-    
-    public ErrorCode getErrorCode() {
+    public String getErrorCode() {
         return errorCode;
     }
     
-    public void setErrorCode(ErrorCode errorCode) {
+    public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
     }
     
@@ -44,18 +40,6 @@ public class ErrorContainer {
     
     public void setMoreInfo(String moreInfo) {
         this.moreInfo = moreInfo;
-    }
-    
-    public boolean hasFormError() {
-        return (formError != null && !formError.isEmpty());
-    }
-    
-    public List<FormError> getFormError() {
-        return formError;
-    }
-    
-    public void setFormError(List<FormError> formError) {
-        this.formError = formError;
     }
     
 }

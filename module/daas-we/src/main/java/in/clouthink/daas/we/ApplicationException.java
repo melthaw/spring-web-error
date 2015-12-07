@@ -1,70 +1,97 @@
 package in.clouthink.daas.we;
 
+import org.springframework.http.HttpStatus;
+
+import java.util.List;
+
 /**
+ * 
  */
-public class ApplicationException extends RuntimeException {
+public class ApplicationException extends RuntimeException implements
+                                  ErrorCodeProvider,
+                                  HttpStatusProvider,
+                                  MessageProvider,
+                                  FormErrorProvider {
+                                  
+    private Enum<?> error;
     
-    private ErrorCode errorCode;
+    private List<FormError> formErrors;
     
-    private Object[] arguments;
-    
-    public ApplicationException(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public ApplicationException(Enum<?> error) {
+        this.error = error;
     }
     
-    public ApplicationException(ErrorCode errorCode, String message) {
+    public ApplicationException(Enum<?> error, String message) {
         super(message);
-        this.errorCode = errorCode;
+        this.error = error;
     }
     
-    public ApplicationException(ErrorCode errorCode,
+    public ApplicationException(Enum<?> error,
                                 String message,
                                 Throwable cause) {
         super(message, cause);
-        this.errorCode = errorCode;
+        this.error = error;
     }
     
-    public ApplicationException(ErrorCode errorCode,
-                                Object[] arguments,
+    public ApplicationException(Enum<?> error, Throwable cause) {
+        super(cause);
+        this.error = error;
+    }
+    
+    public ApplicationException(Enum<?> error, List<FormError> formErrors) {
+        super();
+        this.error = error;
+        this.formErrors = formErrors;
+    }
+    
+    public ApplicationException(Enum<?> error,
+                                List<FormError> formErrors,
                                 String message) {
         super(message);
-        this.errorCode = errorCode;
-        this.arguments = arguments;
+        this.error = error;
+        this.formErrors = formErrors;
     }
     
-    public ApplicationException(ErrorCode errorCode,
-                                Object[] arguments,
+    public ApplicationException(Enum<?> error,
+                                List<FormError> formErrors,
                                 String message,
                                 Throwable cause) {
         super(message, cause);
-        this.errorCode = errorCode;
-        this.arguments = arguments;
+        this.error = error;
+        this.formErrors = formErrors;
     }
     
-    public ApplicationException(ErrorCode errorCode, Object[] arguments) {
-        this.errorCode = errorCode;
-        this.arguments = arguments;
-    }
-    
-    public ApplicationException(ErrorCode errorCode,
-                                Object[] arguments,
+    public ApplicationException(Enum<?> error,
+                                List<FormError> formErrors,
                                 Throwable cause) {
         super(cause);
-        this.errorCode = errorCode;
-        this.arguments = arguments;
+        this.error = error;
+        this.formErrors = formErrors;
     }
     
-    public ApplicationException(ErrorCode errorCode, Throwable cause) {
-        super(cause);
-        this.errorCode = errorCode;
+    @Override
+    public String getErrorCode() {
+        if (error instanceof ErrorCodeProvider) {
+            return ((ErrorCodeProvider) error).getErrorCode();
+        }
+        if (error instanceof ValueProvider) {
+            return ((ValueProvider) error).getValue();
+        }
+        
+        return error.toString();
     }
-    
-    public ErrorCode getErrorCode() {
-        return errorCode;
+
+    @Override
+    public HttpStatus getHttpStatus() {
+        if (error instanceof HttpStatusProvider) {
+            ((HttpStatusProvider)error).getHttpStatus();
+        }
+        return null;
     }
-    
-    public Object[] getArguments() {
-        return arguments;
+
+    @Override
+    public List<FormError> getFormErrors() {
+        return formErrors;
     }
     
 }
