@@ -14,7 +14,7 @@ public enum SharedErrorCode implements ErrorCodeProvider,HttpStatusProvider {
     UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR),
     UNEXPECTED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR);
-                                                                             
+
     private HttpStatus httpStatus;
     
     SharedErrorCode(HttpStatus httpStatus) {

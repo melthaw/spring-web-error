@@ -2,6 +2,8 @@ package in.clouthink.daas.we.sample;
 
 import java.util.List;
 
+import in.clouthink.daas.we.DefaultErrorResolver;
+import in.clouthink.daas.we.ErrorMappingResolver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
@@ -21,18 +23,21 @@ import in.clouthink.daas.we.CustomExceptionHandlerExceptionResolver;
 public class ApplicationConfigure extends WebMvcConfigurerAdapter {
     
     private List<HttpMessageConverter<?>> converters;
-
+    
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         this.converters = converters;
     }
-
+    
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
         exceptionHandlerExceptionResolver.setMessageConverters(converters);
         exceptionHandlerExceptionResolver.setContentNegotiationManager(new ContentNegotiationManager());
-	    exceptionHandlerExceptionResolver.afterPropertiesSet();
+        exceptionHandlerExceptionResolver.getErrorResolver()
+                                         .add(new ErrorMappingResolver())
+                                         .add(new DefaultErrorResolver());
+        exceptionHandlerExceptionResolver.afterPropertiesSet();
         exceptionResolvers.add(exceptionHandlerExceptionResolver);
     }
     
