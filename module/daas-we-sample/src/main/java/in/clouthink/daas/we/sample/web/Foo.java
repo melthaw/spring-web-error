@@ -8,6 +8,13 @@ public class Foo implements Serializable {
     @NotNull
     private String name;
     
+    public Foo() {
+    }
+    
+    public Foo(String name) {
+        this.name = name;
+    }
+    
     public String getName() {
         return name;
     }

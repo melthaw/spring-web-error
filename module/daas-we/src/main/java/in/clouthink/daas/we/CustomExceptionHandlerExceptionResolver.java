@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
@@ -29,6 +31,7 @@ public class CustomExceptionHandlerExceptionResolver extends
     
     public CustomExceptionHandlerExceptionResolver(boolean developerMode) {
         super();
+        getMessageConverters().add(new MappingJackson2HttpMessageConverter());
         this.developerMode = developerMode;
     }
     

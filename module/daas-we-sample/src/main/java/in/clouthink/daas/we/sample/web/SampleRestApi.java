@@ -75,4 +75,12 @@ public class SampleRestApi {
                                        "The error message is customized");
     }
     
+    @RequestMapping(value = "/err7", method = RequestMethod.GET)
+    @ResponseBody
+    public void err7() {
+        throw new FooException("foo-message",
+                               "foo-err-code",
+                               new Foo("foo-err-data"));
+    }
+    
 }

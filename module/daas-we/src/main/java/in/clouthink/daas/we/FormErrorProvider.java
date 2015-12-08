@@ -5,8 +5,6 @@ import java.util.List;
 /**
  *
  */
-public interface FormErrorProvider {
-    
-    List<FormError> getFormErrors();
-    
+public interface FormErrorProvider extends ErrorDataProvider<List<FormError>> {
+
 }

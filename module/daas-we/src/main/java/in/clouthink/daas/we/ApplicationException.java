@@ -80,17 +80,17 @@ public class ApplicationException extends RuntimeException implements
         
         return error.toString();
     }
-
+    
     @Override
     public HttpStatus getHttpStatus() {
         if (error instanceof HttpStatusProvider) {
-            ((HttpStatusProvider)error).getHttpStatus();
+            ((HttpStatusProvider) error).getHttpStatus();
         }
         return null;
     }
-
+    
     @Override
-    public List<FormError> getFormErrors() {
+    public List<FormError> getErrorData() {
         return formErrors;
     }
     

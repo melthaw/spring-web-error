@@ -1,13 +1,13 @@
 package in.clouthink.daas.we;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
 
 /**
  *
@@ -89,11 +89,11 @@ public class ResponseEntityBuilder {
                                                              String message,
                                                              HttpHeaders headers,
                                                              HttpStatus status,
-                                                             List<FormError> formErrors) {
+                                                             Object errorData) {
                                                              
         ErrorResponse errorResponse = new ErrorResponse();
-        if (formErrors != null || ex instanceof FormErrorProvider) {
-            errorResponse = new FormErrorResponse();
+        if (errorData != null || ex instanceof ErrorDataProvider) {
+            errorResponse = new ErrorDataResponse();
         }
         
         if (ex instanceof ErrorCodeProvider) {
@@ -115,11 +115,11 @@ public class ResponseEntityBuilder {
             errorResponse.setDeveloperMessage(getStackTrace(ex));
         }
         
-        if (formErrors != null) {
-            ((FormErrorResponse) errorResponse).setFormErrors(formErrors);
+        if (errorData != null) {
+            ((ErrorDataResponse) errorResponse).setErrorData(errorData);
         }
-        else if (ex instanceof FormErrorProvider) {
-            ((FormErrorResponse) errorResponse).setFormErrors(((FormErrorProvider) ex).getFormErrors());
+        else if (ex instanceof ErrorDataProvider) {
+            ((ErrorDataResponse) errorResponse).setErrorData(((ErrorDataProvider) ex).getErrorData());
         }
         
         headers.set("Content-Type", "application/json");
