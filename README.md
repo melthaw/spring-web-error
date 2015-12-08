@@ -59,7 +59,7 @@ So far `2.0.0` is available
 ## Get Hooking Started
 
 First ,we assume you have the base knowledge of Spring Mvc Exception Handler, especially, how the ExceptionHandlerExceptionResolver is working.
-Here is the extension points we supplied in the CustomExceptionHandlerExceptionResolver which is override the default is the Spring ExceptionHandlerExceptionResolver.
+Here is the extension points we supplied in the CustomExceptionHandlerExceptionResolver which is override the default Spring ExceptionHandlerExceptionResolver.
 
 * ErrorContextBuilder
 * ErrorResolver 
