@@ -42,7 +42,7 @@ if any exception thrown by the `@Controller` from Spring MVC framework.
 
 # Usage
 
-So far `1.1.0` is available 
+So far `2.0.0` is available 
 
 ## Maven
 
@@ -56,27 +56,145 @@ So far `1.1.0` is available
 
     compile "in.clouthink.daas:daas-we:${daas_we_version}"
 
+## Get Hooking Started
+
+First ,we assume you have the base knowledge of Spring Mvc Exception Handler, especially, how the ExceptionHandlerExceptionResolver is working.
+Here is the extension points we supplied in the CustomExceptionHandlerExceptionResolver which is override the default is the Spring ExceptionHandlerExceptionResolver.
+
+* ErrorContextBuilder
+* ErrorResolver 
+* ErrorResponseHandler
+
+### ErrorContextBuilder
+
+ErrorContextBuilder will build the ErrorContext instance based on the parameters which can access from the ExceptionHandlerExceptionResolver#doResolveHandlerMethodException.
+The default implementation is in.clouthink.daas.we.DefaultErrorContextBuilder which build the DefaultErrorContext for output.
+
+    public interface ErrorContextBuilder {
+        
+        ErrorContext build(HttpServletRequest request,
+                           HttpServletResponse response,
+                           HandlerMethod handlerMethod,
+                           Exception exception);
+                           
+    }
+
+Here is the definition of ErrorContext, it's quite simple that returns the Exception thrown by your controller's method and the method is returned wrapped in Spring HandlerMethod.
+And the ErrorContext also tells that the ExceptionResolver is under developer mode or not. Obviously, if you are under the developer mode , more detailed message will be output for the developer.
+
+    public interface ErrorContext {
+        
+        HandlerMethod getHandlerMethod();
+        
+        Exception getException();
+        
+        boolean isDeveloperMode();
+        
+    }
+
+If you have something else you'd like to add to the ErrorContext ,just extend it . But please also remember to supply the corresponding ErrorContextBuilder .
+And pop it into the CustomExceptionHandlerExceptionResolver instance .
+
+     CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
+     exceptionHandlerExceptionResolver.setErrorContextBuilder(theCustomizedErrorContextBuilder);
+
+### ErrorResolver
+
+Once you get the ErrorContext built ,we can move to the next phase , resolve the error from context. 
+
+    public interface ErrorResolver<T> {
+        
+        ResponseEntity<T> resolve(ErrorContext errorContext);
+        
+    }
+
+As the interface defined, the resolve method will return the ResponseEntity type in generic style. 
+In another words, any body of the ResponseEntity is legal .
+Our default implementation is in.clouthink.daas.we.ErrorResponse for your reference.
+
+    public class ErrorResponse {
+    
+        private String errorCode;
+        
+        private String errorMessage;
+        
+        private String developerMessage;
+        
+        private String moreInfo;
+        
+        //GETTERs 
+        //SETTERs
+        
+    }
+    
+Three build-in implementations of ErrorResolver is listed as follow:
+
+* ErrorMappingResolver 
+
+for the controller methods annotated with @ErrorMappings
+
+* DefaultErrorResolver 
+
+The general handler for the controller methods which is not annotated with @ErrorMappings
+
+* CompositeErrorResolver 
+
+The CompositeErrorResolver acts as the ErrorResolver registry which the ErrorResolver can be added to it and ordered in list,
+When no one in the ErrorResolver registry can resolve the incoming ErrorContext, and default resolver will take over.
+
+Here is the configure sample we recommended.
+
+    CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
+    exceptionHandlerExceptionResolver.getErrorResolver() // return the composite error resolver by default
+                                     .add(new ErrorMappingResolver())
+                                     .setDefaultErrorResolver(new DefaultErrorResolver());
+
+If you implement the ErrorResolver for customization , here is the way you can make it work for the CustomExceptionHandlerExceptionResolver
+
+Way 1:
+
+    CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
+    exceptionHandlerExceptionResolver.setErrorResolver(yourErrorResolverImplementation); // replace the default composite error resolver
+
+Way 2:
+    
+    CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
+    exceptionHandlerExceptionResolver.getErrorResolver()
+                                     .add(new ErrorMappingResolver())
+                                     .add(yourErrorResolverImplementation) // or add to the registry
+                                     .setDefaultErrorResolver(new DefaultErrorResolver());    
+
+
+### ErrorResponseHandler
+
+Finally , we need to convert the error response to match the http servlet spec.
+
+    public interface ErrorResponseHandler<T> {
+        
+        void handle(ServletWebRequest webRequest, ResponseEntity<T> responseEntity);
+        
+    }
+
+The default implementation is in.clouthink.daas.we.DefaultErrorResponseHandler which is quite simple to delegate the work to HandlerMethodReturnValueHandler.
+
 
 ## Spring Configuration
 
-How to enable the new Rest Response Exception Handler implementation.
-
-    private List<HttpMessageConverter<?>> converters;
-    
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        this.converters = converters;
+How to enable the new Customized Exception Handler Exception Resolver implementation.
+ 
+    @Bean
+    public HandlerExceptionResolver customExceptionHandlerExceptionResolver() {
+        CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
+        exceptionHandlerExceptionResolver.getErrorResolver()
+                                         .add(new ErrorMappingResolver())
+                                         .setDefaultErrorResolver(new DefaultErrorResolver());
+        return exceptionHandlerExceptionResolver;
     }
-
+    
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-        CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
-        exceptionHandlerExceptionResolver.setMessageConverters(converters);
-        exceptionHandlerExceptionResolver.setContentNegotiationManager(new ContentNegotiationManager());
-	    exceptionHandlerExceptionResolver.afterPropertiesSet();
-        exceptionResolvers.add(exceptionHandlerExceptionResolver);
+        exceptionResolvers.add(customExceptionHandlerExceptionResolver());
     }
-    
     
 How to run the daas we sample :
     

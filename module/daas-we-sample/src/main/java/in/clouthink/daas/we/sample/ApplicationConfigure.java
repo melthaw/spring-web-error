@@ -7,6 +7,7 @@ import in.clouthink.daas.we.ErrorMappingResolver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -22,23 +23,18 @@ import in.clouthink.daas.we.CustomExceptionHandlerExceptionResolver;
 @ComponentScan(value = "in.clouthink.daas.we.sample")
 public class ApplicationConfigure extends WebMvcConfigurerAdapter {
     
-    private List<HttpMessageConverter<?>> converters;
-    
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        this.converters = converters;
+    @Bean
+    public HandlerExceptionResolver customExceptionHandlerExceptionResolver() {
+        CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
+        exceptionHandlerExceptionResolver.getErrorResolver()
+                                         .add(new ErrorMappingResolver())
+                                         .setDefaultErrorResolver(new DefaultErrorResolver());
+        return exceptionHandlerExceptionResolver;
     }
     
     @Override
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-        CustomExceptionHandlerExceptionResolver exceptionHandlerExceptionResolver = new CustomExceptionHandlerExceptionResolver(true);
-        exceptionHandlerExceptionResolver.setMessageConverters(converters);
-        exceptionHandlerExceptionResolver.setContentNegotiationManager(new ContentNegotiationManager());
-        exceptionHandlerExceptionResolver.getErrorResolver()
-                                         .add(new ErrorMappingResolver())
-                                         .add(new DefaultErrorResolver());
-        exceptionHandlerExceptionResolver.afterPropertiesSet();
-        exceptionResolvers.add(exceptionHandlerExceptionResolver);
+        exceptionResolvers.add(customExceptionHandlerExceptionResolver());
     }
     
     public static void main(String[] args) throws Exception {
