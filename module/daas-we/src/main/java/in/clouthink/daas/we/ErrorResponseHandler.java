@@ -2,12 +2,18 @@ package in.clouthink.daas.we;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.method.HandlerMethod;
 
 /**
  *
  */
 public interface ErrorResponseHandler<T> {
-    
-    void handle(ServletWebRequest webRequest, ResponseEntity<T> responseEntity);
-    
+
+	/**
+	 * @param webRequest
+	 * @param handlerMethod
+	 * @param responseEntity
+	 */
+	void handle(ServletWebRequest webRequest, HandlerMethod handlerMethod, ResponseEntity<T> responseEntity);
+
 }
