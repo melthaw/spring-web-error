@@ -6,7 +6,7 @@
 
     <groupId>in.clouthink.daas</groupId>
     <artifactId>daas-we</artifactId>
-    <version>2.0.1-snapshot</version>
+    <version>2.0.1</version>
     <packaging>jar</packaging>
     <name>daas-we</name>
     <url>http://clouthink.in</url>
