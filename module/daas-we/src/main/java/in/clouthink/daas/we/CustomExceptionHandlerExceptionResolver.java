@@ -3,6 +3,8 @@ package in.clouthink.daas.we;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -16,6 +18,8 @@ import org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodPro
 public class CustomExceptionHandlerExceptionResolver extends
 													 ExceptionHandlerExceptionResolver implements
 																					   InitializingBean {
+
+	private static final Log logger = LogFactory.getLog(CustomExceptionHandlerExceptionResolver.class);
 
 	private boolean developerMode = true;
 
@@ -74,6 +78,7 @@ public class CustomExceptionHandlerExceptionResolver extends
 														   HttpServletResponse response,
 														   HandlerMethod handlerMethod,
 														   Exception exception) {
+		logger.error(exception,exception);
 		ErrorContext errorContext = errorContextBuilder.build(request,
 															  response,
 															  handlerMethod,
