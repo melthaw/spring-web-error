@@ -1,8 +1,5 @@
 package in.clouthink.daas.we;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -15,13 +12,17 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 import org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor;
 
-public class CustomExceptionHandlerExceptionResolver extends
-													 ExceptionHandlerExceptionResolver implements
-																					   InitializingBean {
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class CustomExceptionHandlerExceptionResolver extends ExceptionHandlerExceptionResolver implements
+																							   InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(CustomExceptionHandlerExceptionResolver.class);
 
 	private boolean developerMode = true;
+
+	private ExceptionHandlerMatcher exceptionHandlerMatcher = new DefaultExceptionHandlerMatcher();
 
 	private ErrorContextBuilder errorContextBuilder;
 
@@ -61,6 +62,14 @@ public class CustomExceptionHandlerExceptionResolver extends
 		return this;
 	}
 
+	public CustomExceptionHandlerExceptionResolver setMatcher(ExceptionHandlerMatcher exceptionHandlerMatcher) {
+		if (exceptionHandlerMatcher == null) {
+			throw new NullPointerException();
+		}
+		this.exceptionHandlerMatcher = exceptionHandlerMatcher;
+		return this;
+	}
+
 	public ErrorResponseHandler getErrorResponseHandler() {
 		return errorResponseHandler;
 	}
@@ -78,28 +87,25 @@ public class CustomExceptionHandlerExceptionResolver extends
 														   HttpServletResponse response,
 														   HandlerMethod handlerMethod,
 														   Exception exception) {
-		logger.error(exception,exception);
-		ErrorContext errorContext = errorContextBuilder.build(request,
-															  response,
-															  handlerMethod,
-															  exception);
+		logger.error(exception, exception);
+		if (exceptionHandlerMatcher.isMatched(handlerMethod, exception)) {
+			ErrorContext errorContext = errorContextBuilder.build(request, response, handlerMethod, exception);
 
-		ResponseEntity errorResponseEntity = errorResolver.resolve(errorContext);
-		if (errorResponseEntity == null) {
-			return super.doResolveHandlerMethodException(request,
-														 response,
-														 handlerMethod,
-														 exception);
+			ResponseEntity errorResponseEntity = errorResolver.resolve(errorContext);
+			if (errorResponseEntity == null) {
+				return super.doResolveHandlerMethodException(request, response, handlerMethod, exception);
+			}
+
+			ServletWebRequest webRequest = new ServletWebRequest(request, response);
+			webRequest.getResponse().setStatus(errorResponseEntity.getStatusCode().value());
+
+			errorResponseHandler.handle(webRequest, handlerMethod, errorResponseEntity);
+
+			return new ModelAndView();
 		}
-
-		ServletWebRequest webRequest = new ServletWebRequest(request, response);
-		webRequest.getResponse()
-				  .setStatus(errorResponseEntity.getStatusCode().value());
-
-		errorResponseHandler.handle(webRequest, handlerMethod, errorResponseEntity);
-
-		return new ModelAndView();
+		return super.doResolveHandlerMethodException(request, response, handlerMethod, exception);
 	}
+
 
 	@Override
 	public void afterPropertiesSet() {

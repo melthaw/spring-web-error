@@ -36,7 +36,7 @@ public class ApplicationConfigure extends WebMvcConfigurerAdapter {
     public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
         exceptionResolvers.add(customExceptionHandlerExceptionResolver());
     }
-    
+
     public static void main(String[] args) throws Exception {
         SpringApplication.run(ApplicationConfigure.class, args);
     }

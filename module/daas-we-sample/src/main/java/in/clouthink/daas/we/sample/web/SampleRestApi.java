@@ -14,7 +14,7 @@ import in.clouthink.daas.we.annotation.ErrorMapping;
 import in.clouthink.daas.we.annotation.ErrorMappings;
 
 @RestController
-@RequestMapping("/we/sample")
+@RequestMapping("/we/sample1")
 public class SampleRestApi {
     
     /**

@@ -9,10 +9,17 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 public interface ErrorContextBuilder {
-    
-    ErrorContext build(HttpServletRequest request,
-                       HttpServletResponse response,
-                       HandlerMethod handlerMethod,
-                       Exception exception);
-                       
+
+	/**
+	 * @param request
+	 * @param response
+	 * @param handlerMethod
+	 * @param exception
+	 * @return
+	 */
+	ErrorContext build(HttpServletRequest request,
+					   HttpServletResponse response,
+					   HandlerMethod handlerMethod,
+					   Exception exception);
+
 }

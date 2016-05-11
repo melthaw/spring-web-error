@@ -6,7 +6,10 @@ import org.springframework.http.HttpStatus;
  *
  */
 public interface HttpStatusProvider {
-    
-    HttpStatus getHttpStatus();
-    
+
+	/**
+	 * @return
+	 */
+	HttpStatus getHttpStatus();
+
 }
