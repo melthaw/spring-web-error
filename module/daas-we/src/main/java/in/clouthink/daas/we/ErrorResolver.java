@@ -6,7 +6,11 @@ import org.springframework.http.ResponseEntity;
  *
  */
 public interface ErrorResolver<T> {
-    
-    ResponseEntity<T> resolve(ErrorContext errorContext);
-    
+
+	/**
+	 * @param errorContext
+	 * @return
+	 */
+	ResponseEntity<T> resolve(ErrorContext errorContext);
+
 }

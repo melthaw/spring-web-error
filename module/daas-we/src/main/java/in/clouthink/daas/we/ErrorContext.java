@@ -6,11 +6,20 @@ import org.springframework.web.method.HandlerMethod;
  *
  */
 public interface ErrorContext {
-    
-    HandlerMethod getHandlerMethod();
-    
-    Exception getException();
-    
-    boolean isDeveloperMode();
-    
+
+	/**
+	 * @return
+	 */
+	HandlerMethod getHandlerMethod();
+
+	/**
+	 * @return
+	 */
+	Exception getException();
+
+	/**
+	 * @return
+	 */
+	boolean isDeveloperMode();
+
 }
