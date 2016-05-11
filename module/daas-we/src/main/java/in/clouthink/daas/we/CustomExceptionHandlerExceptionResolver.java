@@ -62,7 +62,7 @@ public class CustomExceptionHandlerExceptionResolver extends ExceptionHandlerExc
 		return this;
 	}
 
-	public CustomExceptionHandlerExceptionResolver setMatcher(ExceptionHandlerMatcher exceptionHandlerMatcher) {
+	public CustomExceptionHandlerExceptionResolver setHandlerMatcher(ExceptionHandlerMatcher exceptionHandlerMatcher) {
 		if (exceptionHandlerMatcher == null) {
 			throw new NullPointerException();
 		}
