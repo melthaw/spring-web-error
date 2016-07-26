@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 /**
- *
+ * @author dz
  */
 public class ApplicationException extends RuntimeException implements ErrorCodeProvider,
 																	  HttpStatusProvider,

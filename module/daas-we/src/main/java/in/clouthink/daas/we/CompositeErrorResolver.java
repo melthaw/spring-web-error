@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- *
+ * @author dz
  */
 public class CompositeErrorResolver implements ErrorResolver {
 

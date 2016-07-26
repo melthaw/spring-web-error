@@ -42,7 +42,7 @@ if any exception thrown by the `@Controller` from Spring MVC framework.
 
 # Usage
 
-So far `2.1.0` is available 
+So far `2.1.1` is available 
 
 ## Maven
 

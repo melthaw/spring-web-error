@@ -15,6 +15,9 @@ import org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodPro
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ *  @author dz
+ */
 public class CustomExceptionHandlerExceptionResolver extends ExceptionHandlerExceptionResolver implements
 																							   InitializingBean {
 
