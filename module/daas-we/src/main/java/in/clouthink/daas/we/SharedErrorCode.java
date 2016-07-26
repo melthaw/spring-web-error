@@ -2,6 +2,9 @@ package in.clouthink.daas.we;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ *  @author dz
+ */
 public enum SharedErrorCode implements ErrorCodeProvider, HttpStatusProvider {
 
 	BAD_REQUEST(HttpStatus.BAD_REQUEST),

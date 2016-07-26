@@ -1,5 +1,8 @@
 package in.clouthink.daas.we;
 
+/**
+ *  @author dz
+ */
 public class ErrorResponse {
     
     private String errorCode;

@@ -10,7 +10,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 /**
- *
+ * @author dz
  */
 public class ResponseEntityBuilder {
 

@@ -7,6 +7,9 @@ import java.lang.annotation.Target;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ *  @author dz
+ */
 @Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ErrorMapping {
